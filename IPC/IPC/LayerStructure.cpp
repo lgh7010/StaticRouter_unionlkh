@@ -27,6 +27,12 @@ LayerStructure* LayerStructure::GetUpperLayer(int index) {
 
 	return this->_upperLayer;
 }
+LayerStructure* LayerStructure::GetUpperLayer() {
+	if (!this->_upperLayer)
+		return NULL;
+
+	return this->_upperLayer;
+}
 LayerStructure* LayerStructure::GetUnderLayer() {
 	if (!this->_underLayer)
 		return NULL;

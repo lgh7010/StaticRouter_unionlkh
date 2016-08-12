@@ -34,9 +34,11 @@
 #include <afxcontrolbars.h>     // MFC support for ribbons and control bars
 
 
+#define ETHERNET_FRAME_MAX_SIZE			1514
+#define ETHERNET_FRAME_HEADER_SIZE		14
+#define ETHERNET_FRAME_DATA_SIZE		( ETHERNET_FRAME_MAX_SIZE - ETHERNET_FRAME_HEADER_SIZE )
 
-
-
+#define IP_PACKET_DATA_SIZE				1480
 
 
 

@@ -7,7 +7,9 @@ public:
 
 	char*				GetLayerName();
 	LayerStructure*		GetUnderLayer();
-	LayerStructure*		GetUpperLayer(int index);//지금은 상하위 레이어가 하나씩 뿐이지만, 나중에는 상위레이어가 여러개인 경우도 있을 수 있다. 인덱스로 어떤 상위레이어인지 찾는다
+	LayerStructure*		GetUpperLayer(int index);
+	LayerStructure*		GetUpperLayer();
+	//지금은 상하위 레이어가 하나씩 뿐이지만, 나중에는 상위레이어가 여러개인 경우도 있을 수 있다. 인덱스로 어떤 상위레이어인지 찾는다
 	void				SetUnderLayer(LayerStructure* layer);
 	void				SetUpperLayer(LayerStructure* layer);
 
