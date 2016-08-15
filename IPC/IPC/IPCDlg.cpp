@@ -57,7 +57,7 @@ CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
 	, _isBroadcastMode(FALSE)
 	, _srcAddress(0)
 	, _dstAddress(0)
-	, _chatList(_T(""))
+	, _chatList()//_T("")왜 이게 매개로 기본적으로 들어가있었던거지
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	/*
@@ -65,13 +65,14 @@ CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
 	*/
 	this->_isBroadcastMode = FALSE;
 	this->_sendReady = FALSE;
+	//this->_sendButton.EnableWindow(FALSE);//이걸 왜 여기서 하면 에러가 나는거지? 아마 대화상자가 제대로 만들어지기 전에 그걸 Disable부터 하려고 해서인듯
 
+	//각 레이어 객체를 만들고, 서로 상/하위 관계 설정
 	this->_physicsLayer = new PhysicsLayer();
 	this->_datalinkLayer = new DatalinkLayer();
 	this->_networkLayer = new NetworkLayer();
 	this->_transportLayer = new TransportLayer();
 	this->_applicationLayer = new ApplicationLayer();
-
 	this->LinkLayers();
 }
 void CIPCDlg::LinkLayers() {
@@ -95,12 +96,16 @@ void CIPCDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Check(pDX, IDC_CHECK_BROAD, _isBroadcastMode);
 	DDX_Text(pDX, IDC_EDIT1, _srcAddress);
 	DDX_Text(pDX, IDC_EDIT2, _dstAddress);
-	DDX_LBString(pDX, IDC_LIST1, _chatList);
 	DDX_Control(pDX, IDC_EDIT1, _srcAddressPanel);
 	DDX_Control(pDX, IDC_EDIT2, _dstAddressPanel);
 	DDX_Control(pDX, IDC_BUTTON_SET, _setResetButton);
 	DDX_Control(pDX, IDC_CHECK_BROAD, _broadcastPanel);
+	DDX_Control(pDX, IDC_LIST1, _chatList);
+	DDX_Control(pDX, IDC_BUTTON_SEND, _sendButton);
 }
+
+UINT RegSendMsg;//메시지는 헤더에 선언하고 this->로 사용할 수 없다.
+UINT RegAckMsg;//그리고 선언 자체도 헤더에 하면 컴파일에러가 나는데, 구체적인 이유는 아직 모르겠다. 그리고 이 변수이름은 당연히 자유롭다.
 
 BEGIN_MESSAGE_MAP(CIPCDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
@@ -109,6 +114,12 @@ BEGIN_MESSAGE_MAP(CIPCDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_SET, &CIPCDlg::OnBnClickedButtonSet)
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CIPCDlg::OnBnClickedButtonSend)
 	ON_BN_CLICKED(IDC_CHECK_BROAD, &CIPCDlg::OnCheckBroadcast)
+
+	/////////이하는 내가 추가한 메시지맵. REGISTERED_MESSAGE는 이미 있는거네??
+	//On_REGISTERED_MESSAGE(메시지, 해당 메시지로 동작시킬 함수이름)인듯
+	ON_REGISTERED_MESSAGE(RegSendMsg, &CIPCDlg::OnSystemMsgSend)
+	ON_REGISTERED_MESSAGE(RegAckMsg, &CIPCDlg::OnSystemMsgAck)
+	
 END_MESSAGE_MAP()
 
 
@@ -142,6 +153,14 @@ BOOL CIPCDlg::OnInitDialog()
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
+
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	this->_sendButton.EnableWindow(FALSE);//이걸 위에서 초기화하는거 다 넣는곳에 넣으려고 했는데 그러면 에러가 나서 할수없이 여기에 넣었다.
+
+	//System메시지 설정. 이걸 Dlg생성자에서 하면 당연히 선언되어있지 않다는 빌드에러가 뜬다. 그래서 여기에 둔다.
+	RegSendMsg = RegisterWindowMessage(_T("SendMsg"));
+	RegAckMsg = RegisterWindowMessage(_T("AckMsg"));
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// TODO: Add extra initialization here
 	return TRUE;  // return TRUE  unless you set the focus to a control
@@ -206,13 +225,10 @@ void CIPCDlg::OnBnClickedButtonSet(){//Set버튼을 누른 경우의 작동
 		this->_dstAddressPanel.EnableWindow(TRUE);
 		this->_srcAddressPanel.EnableWindow(TRUE);
 		this->_broadcastPanel.EnableWindow(TRUE);
+		this->_sendButton.EnableWindow(FALSE);
 	} else {//셋을 누르는 경우임
 		if (!this->_srcAddress || !this->_dstAddress) {
 			MessageBox(_T("주소가 올바르지 않습니다."), _T("경고"), MB_OK | MB_ICONSTOP);
-			this->_srcAddress = 0;
-			this->_srcAddressPanel.SetWindowTextW(_T("0"));
-			this->_dstAddress = 0;
-			this->_dstAddressPanel.SetWindowTextW(_T("0"));
 			return;
 		}
 
@@ -224,6 +240,7 @@ void CIPCDlg::OnBnClickedButtonSet(){//Set버튼을 누른 경우의 작동
 		this->_dstAddressPanel.EnableWindow(FALSE);
 		this->_srcAddressPanel.EnableWindow(FALSE);
 		this->_broadcastPanel.EnableWindow(FALSE);
+		this->_sendButton.EnableWindow(TRUE);
 	}
 
 	UpdateData(FALSE);
@@ -234,7 +251,26 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 	UpdateData(TRUE);
 
 	if (!this->_message.IsEmpty()) {
+		//호스트에서의 채팅 처리
+		CString msgFront;
+		if (this->_isBroadcastMode) {
+			msgFront.Format(_T("[%d:BROADCAST] "), this->_srcAddress);
+		} else {
+			msgFront.Format(_T("[%d:%d] "), this->_srcAddress, this->_dstAddress);
+		}
+		this->_chatList.AddString(msgFront + this->_message);
 
+		//송신 처리
+		int msgLength = this->_message.GetLength();
+		unsigned char* ppayload = new unsigned char[msgLength];//문자열 관련 라이브러리 함수를 사용하기 위해선 맨 끝에 null문자를 넣는게 좋지만, 여기선 필요없다.
+		memcpy(ppayload, (unsigned char*)(LPCTSTR)this->_message, msgLength);
+		this->_applicationLayer->Send(ppayload, this->_message.GetLength());
+
+		//전송이 잘 완료되면, 호스트의 채팅창을 비워야 한다.
+		this->_message = "";
+
+		//시스템의 모든 프로세스에게 메시지를 보낸다. 이 메시지를 받은 IPC프로그램은 물리층에서부터 레이어들을 거쳐 올라오며, 최종적으로 올바른 수신자에게만 메시지를 표시하게 된다
+		::SendMessageA(HWND_BROADCAST, RegSendMsg, 0, 0);
 	}
 
 	UpdateData(FALSE);
@@ -243,17 +279,30 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 void CIPCDlg::OnCheckBroadcast(){
 	if (this->_isBroadcastMode) {
 		UpdateData(TRUE);
-		MessageBox(_T("일반 모드로 전환"), _T("알림"), MB_OK | MB_ICONSTOP);
 		this->_dstAddress = 0;
 		this->_dstAddressPanel.SetWindowTextW(_T("0"));
 		this->_dstAddressPanel.EnableWindow(TRUE);
 		this->_isBroadcastMode = FALSE;
 	} else {
 		UpdateData(TRUE);
-		MessageBox(_T("브로드캐스트 모드로 전환"), _T("알림"), MB_OK | MB_ICONSTOP);
 		this->_dstAddress = (unsigned int)0xff;
 		this->_dstAddressPanel.SetWindowTextW(_T("255"));
 		this->_dstAddressPanel.EnableWindow(FALSE);
 		this->_isBroadcastMode = TRUE;
 	}
+}
+
+BOOL CIPCDlg::Receive(unsigned char * ppayload){
+	return 0;
+}
+
+LRESULT CIPCDlg::OnSystemMsgSend(WPARAM wParam, LPARAM lParam){
+	this->_physicsLayer->Receive();
+	AfxMessageBox(_T("asdf"));
+	return 0;
+}
+
+LRESULT CIPCDlg::OnSystemMsgAck(WPARAM wParam, LPARAM lParam){
+	AfxMessageBox(_T("ffffffff"));
+	return 0;
 }

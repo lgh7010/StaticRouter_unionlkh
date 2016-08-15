@@ -54,14 +54,20 @@ public:
 	afx_msg void OnBnClickedButtonSend();
 	afx_msg void OnCheckBroadcast();
 
+	BOOL				Receive(unsigned char* ppayload);
+
 private:
 	CString				_message;				// 유저가 입력한 채팅 메시지
 	CButton				_broadcastPanel;
 	BOOL				_isBroadcastMode;
 	UINT				_srcAddress;
 	UINT				_dstAddress;
-	CString				_chatList;
 	CEdit				_srcAddressPanel;
 	CEdit				_dstAddressPanel;
 	CButton				_setResetButton;
+	CListBox			_chatList;
+	CButton				_sendButton;
+
+	LRESULT				OnSystemMsgSend(WPARAM wParam, LPARAM lParam);//이 함수이름은 아무렇게나 해도, '메시지멥'에 등록만 잘하면 된다.
+	LRESULT				OnSystemMsgAck(WPARAM wParam, LPARAM lParam);
 };
