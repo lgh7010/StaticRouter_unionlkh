@@ -30,5 +30,9 @@ public:
 		//unsigned char IP_option	//option(if any)				unknown
 		unsigned char IP_data[IP_PACKET_DATA_SIZE];//data			1480 Byte
 	};
+
+private :
+	void		ResetHeader();
+	PACKET		_packet;
 };
 

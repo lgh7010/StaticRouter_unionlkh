@@ -50,10 +50,10 @@ void DatalinkLayer::SetSrcAddress(unsigned char * pAddress) {
 	//this->_ethernetFrame.EF_srcaddr = pAddress;
 	memcpy(this->_frame.EF_srcaddr, pAddress, 6);
 }
-unsigned char * DatalinkLayer::GetDstAddress() {
+unsigned char* DatalinkLayer::GetDstAddress() {
 	return this->_frame.EF_dstaddr;
 }
-unsigned char * DatalinkLayer::GetSrcAddress() {
+unsigned char* DatalinkLayer::GetSrcAddress() {
 	return this->_frame.EF_srcaddr;
 }
 

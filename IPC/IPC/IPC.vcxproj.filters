@@ -45,6 +45,12 @@
     <ClInclude Include="DatalinkLayer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TransportLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ApplicationLayer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="IPC.cpp">
@@ -66,6 +72,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="DatalinkLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TransportLayer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ApplicationLayer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
