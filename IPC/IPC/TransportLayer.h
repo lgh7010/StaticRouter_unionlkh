@@ -4,7 +4,7 @@
 class TransportLayer : public LayerStructure
 {
 public:
-	TransportLayer();
+	TransportLayer(char* pName);
 	~TransportLayer();
 
 	BOOL			Receive(unsigned char* ppayload);

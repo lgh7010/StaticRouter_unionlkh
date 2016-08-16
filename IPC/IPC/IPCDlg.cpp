@@ -52,7 +52,7 @@ END_MESSAGE_MAP()
 
 
 CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
-	: CDialogEx(IDD_IPC_DIALOG, pParent), LayerStructure("Application Dialog")
+	: CDialogEx(IDD_IPC_DIALOG, pParent), LayerStructure("DLG")
 	, _message(_T(""))
 	, _isBroadcastMode(FALSE)
 	, _srcAddress(0)
@@ -65,28 +65,33 @@ CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
 	*/
 	this->_isBroadcastMode = FALSE;
 	this->_sendReady = FALSE;
+	this->_doesGetAck = FALSE;
 	//this->_sendButton.EnableWindow(FALSE);//이걸 왜 여기서 하면 에러가 나는거지? 아마 대화상자가 제대로 만들어지기 전에 그걸 Disable부터 하려고 해서인듯
 
 	//각 레이어 객체를 만들고, 서로 상/하위 관계 설정
-	this->_physicsLayer = new PhysicsLayer();
-	this->_datalinkLayer = new DatalinkLayer();
-	this->_networkLayer = new NetworkLayer();
-	this->_transportLayer = new TransportLayer();
-	this->_applicationLayer = new ApplicationLayer();
+	this->_pPhysicsLayer = new PhysicsLayer("PHY");
+	this->_pDatalinkLayer = new DatalinkLayer("DTL");
+	this->_pNetworkLayer = new NetworkLayer("NET");
+	this->_pTransportLayer = new TransportLayer("TRP");
+	this->_pApplicationLayer = new ApplicationLayer("APP");
+
 	this->LinkLayers();
 }
 void CIPCDlg::LinkLayers() {
-	this->_physicsLayer->SetUpperLayer(this->_datalinkLayer);
-	this->_datalinkLayer->SetUnderLayer(this->_physicsLayer);
+	this->_pPhysicsLayer->SetUpperLayer(this->_pDatalinkLayer);
+	this->_pDatalinkLayer->SetUnderLayer(this->_pPhysicsLayer);
 
-	this->_datalinkLayer->SetUpperLayer(this->_networkLayer);
-	this->_networkLayer->SetUnderLayer(this->_datalinkLayer);
+	this->_pDatalinkLayer->SetUpperLayer(this->_pNetworkLayer);
+	this->_pNetworkLayer->SetUnderLayer(this->_pDatalinkLayer);
 
-	this->_networkLayer->SetUpperLayer(this->_transportLayer);
-	this->_transportLayer->SetUnderLayer(this->_networkLayer);
+	this->_pNetworkLayer->SetUpperLayer(this->_pTransportLayer);
+	this->_pTransportLayer->SetUnderLayer(this->_pNetworkLayer);
 
-	this->_transportLayer->SetUpperLayer(this->_applicationLayer);
-	this->_applicationLayer->SetUnderLayer(this->_transportLayer);
+	this->_pTransportLayer->SetUpperLayer(this->_pApplicationLayer);
+	this->_pApplicationLayer->SetUnderLayer(this->_pTransportLayer);
+
+	this->_pApplicationLayer->SetUpperLayer(this);
+	this->SetUnderLayer(this->_pApplicationLayer);
 }
 
 void CIPCDlg::DoDataExchange(CDataExchange* pDX)
@@ -234,8 +239,8 @@ void CIPCDlg::OnBnClickedButtonSet(){//Set버튼을 누른 경우의 작동
 
 		this->_setResetButton.SetWindowTextW(_T("Reset"));
 		this->_sendReady = TRUE;
-		this->_applicationLayer->SetSrcAddress(this->_srcAddress);
-		this->_applicationLayer->SetDstAddress(this->_dstAddress);
+		this->_pApplicationLayer->SetSrcAddress(this->_srcAddress);
+		this->_pApplicationLayer->SetDstAddress(this->_dstAddress);
 
 		this->_dstAddressPanel.EnableWindow(FALSE);
 		this->_srcAddressPanel.EnableWindow(FALSE);
@@ -261,16 +266,17 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 		this->_chatList.AddString(msgFront + this->_message);
 
 		//송신 처리
+		this->_doesGetAck = FALSE;//수신자가 브로드캐스트된 레지스터메시지를 받으면 ACK 메시지를 브로드캐스트하는데, 그걸 받으면 이걸 TRUE로 바꾼다. 이 변수는 최초 송신자가 자신이 보낸걸 수신자가 잘 받았는지 안받았는지 체크한다.
 		int msgLength = this->_message.GetLength();
 		unsigned char* ppayload = new unsigned char[msgLength];//문자열 관련 라이브러리 함수를 사용하기 위해선 맨 끝에 null문자를 넣는게 좋지만, 여기선 필요없다.
 		memcpy(ppayload, (unsigned char*)(LPCTSTR)this->_message, msgLength);
-		this->_applicationLayer->Send(ppayload, this->_message.GetLength());
-
-		//전송이 잘 완료되면, 호스트의 채팅창을 비워야 한다.
-		this->_message = "";
+		this->_pApplicationLayer->Send(ppayload, this->_message.GetLength());
 
 		//시스템의 모든 프로세스에게 메시지를 보낸다. 이 메시지를 받은 IPC프로그램은 물리층에서부터 레이어들을 거쳐 올라오며, 최종적으로 올바른 수신자에게만 메시지를 표시하게 된다
 		::SendMessageA(HWND_BROADCAST, RegSendMsg, 0, 0);
+
+		//전송이 잘 완료되면, 호스트의 채팅창을 비워야 한다.
+		this->_message = "";
 	}
 
 	UpdateData(FALSE);
@@ -292,17 +298,24 @@ void CIPCDlg::OnCheckBroadcast(){
 	}
 }
 
-BOOL CIPCDlg::Receive(unsigned char * ppayload){
-	return 0;
+BOOL CIPCDlg::Receive(unsigned char* ppayload){
+	if (!this->_doesGetAck)
+		::SendMessageA(HWND_BROADCAST, RegAckMsg, 0, 0);
+	
+	this->_chatList.AddString( (LPCTSTR)(char*) ppayload);
+	return TRUE;
 }
 
 LRESULT CIPCDlg::OnSystemMsgSend(WPARAM wParam, LPARAM lParam){
-	this->_physicsLayer->Receive();
-	AfxMessageBox(_T("asdf"));
+	this->_pPhysicsLayer->Receive();
+	AfxMessageBox(_T("SystemMsg Send 수신"));
 	return 0;
 }
 
-LRESULT CIPCDlg::OnSystemMsgAck(WPARAM wParam, LPARAM lParam){
-	AfxMessageBox(_T("ffffffff"));
+LRESULT CIPCDlg::OnSystemMsgAck(WPARAM wParam, LPARAM lParam) {
+	AfxMessageBox(_T("ACK 수신"));
+	if (!this->_doesGetAck) {
+		this->_doesGetAck = TRUE;
+	}
 	return 0;
 }

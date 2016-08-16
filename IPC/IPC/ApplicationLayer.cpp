@@ -2,34 +2,44 @@
 #include "ApplicationLayer.h"
 
 
-ApplicationLayer::ApplicationLayer(){
+ApplicationLayer::ApplicationLayer(char* pName) : LayerStructure(pName){
 	this->ResetHeader();
 }
 ApplicationLayer::~ApplicationLayer(){}
 
+
+
 BOOL ApplicationLayer::Receive(unsigned char * ppayload){
-	return 0;
+	AfxMessageBox(_T("어플리케이션 Receive 호출됨"));
+	APPDATA* appdata = (APPDATA*)ppayload;
+
+	BOOL isDone;
+	isDone = this->_pUpperLayer->Receive((unsigned char*)appdata->_data);
+	return isDone;
 }
 
 BOOL ApplicationLayer::Send(unsigned char * ppayload, int appdataSize){
-	return 0;
+	AfxMessageBox(_T("어플리케이션 Send 호출됨"));
+	memcpy(this->_appdata._data, ppayload, appdataSize);
+
+	BOOL isDone;
+	isDone = this->_pUnderLayer->Send((unsigned char*)&this->_appdata, appdataSize + APP_HEADER_SIZE);
+	return isDone;
 }
+
+
+
 
 void ApplicationLayer::SetDstAddress(unsigned int address){
 	this->_appdata._dstAddress = address;
 }
-
 void ApplicationLayer::SetSrcAddress(unsigned int address){
 	this->_appdata._srcAddress = address;
 }
-
-UINT ApplicationLayer::GetDstAddress()
-{
+UINT ApplicationLayer::GetDstAddress(){
 	return this->_appdata._dstAddress;
 }
-
-UINT ApplicationLayer::GetSrcAddress()
-{
+UINT ApplicationLayer::GetSrcAddress(){
 	return this->_appdata._srcAddress;
 }
 

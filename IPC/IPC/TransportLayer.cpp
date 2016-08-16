@@ -2,12 +2,13 @@
 #include "TransportLayer.h"
 
 
-TransportLayer::TransportLayer(){
+TransportLayer::TransportLayer(char* pName) : LayerStructure(pName){
 	this->ResetHeader();
 }
 TransportLayer::~TransportLayer(){}
 
 BOOL TransportLayer::Receive(unsigned char * ppayload){
+	AfxMessageBox(_T("트랜스포트층 Receive"));
 	SEGMENT* pSegment = (SEGMENT*)ppayload;
 
 	BOOL isDone;
@@ -16,6 +17,7 @@ BOOL TransportLayer::Receive(unsigned char * ppayload){
 }
 
 BOOL TransportLayer::Send(unsigned char * ppayload, int applicationDataSize){
+	AfxMessageBox(_T("트랜스포트층 Send"));
 	memcpy(this->_segment.SG_data, ppayload, applicationDataSize);
 
 	BOOL isDone;

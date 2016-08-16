@@ -4,7 +4,7 @@
 class ApplicationLayer : public LayerStructure
 {
 public:
-	ApplicationLayer();
+	ApplicationLayer(char* pName);
 	~ApplicationLayer();
 
 	BOOL			Receive(unsigned char* ppayload);
@@ -18,12 +18,10 @@ public:
 private:
 	void			ResetHeader();
 	typedef struct APPDATA {
-		UINT			_srcAddress;
-		UINT			_dstAddress;
+		UINT			_srcAddress;//2바이트
+		UINT			_dstAddress;//2바이트
 		unsigned char	_data[APP_DATA_SIZE];//일단은 그냥 400바이트다
 	};
 	APPDATA				_appdata;
-
-
 };
 

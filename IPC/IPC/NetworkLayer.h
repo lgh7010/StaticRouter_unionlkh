@@ -4,7 +4,7 @@
 class NetworkLayer : public LayerStructure
 {
 public:
-	NetworkLayer();
+	NetworkLayer(char* pName);
 	~NetworkLayer();
 
 	BOOL			Receive(unsigned char* ppayload);

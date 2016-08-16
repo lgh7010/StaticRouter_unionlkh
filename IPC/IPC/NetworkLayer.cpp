@@ -2,7 +2,7 @@
 #include "NetworkLayer.h"
 
 
-NetworkLayer::NetworkLayer(){
+NetworkLayer::NetworkLayer(char* pName) : LayerStructure(pName){
 	this->ResetHeader();
 }
 NetworkLayer::~NetworkLayer(){}
@@ -11,6 +11,7 @@ NetworkLayer::~NetworkLayer(){}
 
 
 BOOL NetworkLayer::Receive(unsigned char * ppayload){
+	AfxMessageBox(_T("³×Æ®¿öÅ©Ãþ Receive È£ÃâµÊ"));
 	PACKET*	pPacket = (PACKET*)ppayload;
 
 	BOOL isDone;
@@ -19,6 +20,7 @@ BOOL NetworkLayer::Receive(unsigned char * ppayload){
 }
 
 BOOL NetworkLayer::Send(unsigned char * ppayload, int segmentLength){
+	AfxMessageBox(_T("³×Æ®¿öÅ©Ãþ Send È£ÃâµÊ"));
 	memcpy(this->_packet.IP_data, ppayload, segmentLength);
 
 	BOOL isDone;

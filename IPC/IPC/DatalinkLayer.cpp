@@ -2,7 +2,7 @@
 #include "DatalinkLayer.h"
 
 
-DatalinkLayer::DatalinkLayer(){
+DatalinkLayer::DatalinkLayer(char* pName) : LayerStructure(pName){
 	this->ResetFrame();
 }
 DatalinkLayer::~DatalinkLayer(){}
@@ -17,6 +17,7 @@ DatalinkLayer::~DatalinkLayer(){}
 사실, 실제 컴퓨터간 통신에서는 바로 여기서 MAC주소를 비교하는 작업이 이뤄져야 한다.
 */
 BOOL DatalinkLayer::Receive(unsigned char * ppayload) {
+	AfxMessageBox(_T("데이터링크 Receive 호출됨"));
 	ETHERNET_FRAME* pFrame = (ETHERNET_FRAME*)ppayload;
 
 	BOOL isDone;
@@ -33,6 +34,7 @@ BOOL DatalinkLayer::Receive(unsigned char * ppayload) {
 지금은 컴퓨터간 통신이 아니기 때문에 IP주소가 필요하지 않기 때문이다.
 */
 BOOL DatalinkLayer::Send(unsigned char * ppayload, int packetLength) {
+	AfxMessageBox(_T("데이터링크 Send 호출됨"));
 	memcpy(this->_frame.EF_data, ppayload, packetLength);
 
 	BOOL isDone;

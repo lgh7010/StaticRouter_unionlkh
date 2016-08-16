@@ -9,7 +9,9 @@
 	따라서, '수신'또한 해당 파일을 '읽는'것으로 대신한다. Receive함수는 이를 바탕으로 구현되어 있다.
 */
 
-PhysicsLayer::PhysicsLayer() {}
+PhysicsLayer::PhysicsLayer(char* pName) : LayerStructure(pName) {
+	
+}
 PhysicsLayer::~PhysicsLayer(){
 	TRY{
 		CFile::Remove(_T("ipcBuffer.txt"));
@@ -19,6 +21,7 @@ PhysicsLayer::~PhysicsLayer(){
 }
 
 BOOL PhysicsLayer::Receive(){
+	AfxMessageBox(_T("물리층 Receive 호출됨"));
 	TRY{
 		CFile bufFile(_T("ipcBuffer.txt"), CFile::modeRead);
 		int frameLength = ETHERNET_FRAME_HEADER_SIZE + ETHERNET_FRAME_DATA_SIZE;
@@ -26,8 +29,7 @@ BOOL PhysicsLayer::Receive(){
 
 		bufFile.Read(ppayload, frameLength);
 		ppayload[frameLength] = '\0';
-
-		if (!this->_upperLayer->Receive(ppayload)) {
+		if (!this->_pUpperLayer->Receive(ppayload)) {
 			bufFile.Close();
 			return FALSE;
 		}
@@ -38,6 +40,7 @@ BOOL PhysicsLayer::Receive(){
 	return TRUE;
 }
 BOOL PhysicsLayer::Send(unsigned char* ppayload, int frameLength){
+	AfxMessageBox(_T("물리층 Send 호출됨"));
 	TRY{
 		CFile bufFile(_T("ipcBuffer.txt"), CFile::modeCreate | CFile::modeWrite);
 		bufFile.Write(ppayload, frameLength);

@@ -4,7 +4,7 @@
 class PhysicsLayer : public LayerStructure
 {
 public:
-	PhysicsLayer();
+	PhysicsLayer(char* pName);
 	~PhysicsLayer();
 
 	BOOL	Receive();

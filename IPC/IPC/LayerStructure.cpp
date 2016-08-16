@@ -2,43 +2,48 @@
 #include "LayerStructure.h"
 
 //생성자와 소멸자
-LayerStructure::LayerStructure(char* name)
-: _upperLayerCount(0), _underLayer(NULL) {
-	this->_layerName = name;
+LayerStructure::LayerStructure(char* pName)
+: _upperLayerCount(0), _pUnderLayer(NULL) {
+	this->_pLayerName = pName;
 }
 LayerStructure::~LayerStructure(){}
 
 //주요 공개함수들
-void LayerStructure::SetUnderLayer(LayerStructure* layer) {
-	if (!layer)//이건 if(layer == null)과 같다
+void LayerStructure::SetUnderLayer(LayerStructure* pLayer) {
+	if (!pLayer) {
+		AfxMessageBox(_T("하위레이어 설정이 비정상작동"));
 		return;
+	}
 	
-	this->_upperLayer = layer;
+	this->_pUnderLayer = pLayer;//와 시발 이게 UpperLayer로 잘못되어있었어. 그래서 레이어 연결이 안됐던거야 시발 이걸로 하루를 보내다니 씨발
 }
-void LayerStructure::SetUpperLayer(LayerStructure* layer) {
-	if (!layer)//이건 if(layer == null)과 같다
+void LayerStructure::SetUpperLayer(LayerStructure* pLayer) {
+	if (!pLayer){
+		AfxMessageBox(_T("상위레이어 설정이 비정상작동"));
 		return;
+	}
 
-	this->_underLayer = layer;
+	this->_pUpperLayer = pLayer;
+	this->_upperLayerCount++;
 }
 LayerStructure* LayerStructure::GetUpperLayer(int index) {
 	if (index < 0 || index > this->_upperLayerCount || this->_upperLayerCount < 0)
 		return NULL;
 
-	return this->_upperLayer;
+	return this->_pUpperLayer;
 }
 LayerStructure* LayerStructure::GetUpperLayer() {
-	if (!this->_upperLayer)
+	if (!this->_pUpperLayer)
 		return NULL;
 
-	return this->_upperLayer;
+	return this->_pUpperLayer;
 }
 LayerStructure* LayerStructure::GetUnderLayer() {
-	if (!this->_underLayer)
+	if (!this->_pUnderLayer)
 		return NULL;
 
-	return this->_underLayer;
+	return this->_pUnderLayer;
 }
 char* LayerStructure::GetLayerName() {
-	return this->_layerName;
+	return this->_pLayerName;
 }

@@ -40,11 +40,11 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 private://각 레이어 객체들 선언
-	PhysicsLayer*		_physicsLayer;
-	DatalinkLayer*		_datalinkLayer;
-	NetworkLayer*		_networkLayer;
-	TransportLayer*		_transportLayer;
-	ApplicationLayer*	_applicationLayer;
+	PhysicsLayer*		_pPhysicsLayer;
+	DatalinkLayer*		_pDatalinkLayer;
+	NetworkLayer*		_pNetworkLayer;
+	TransportLayer*		_pTransportLayer;
+	ApplicationLayer*	_pApplicationLayer;
 	void				LinkLayers();
 
 	BOOL				_sendReady;
@@ -70,4 +70,6 @@ private:
 
 	LRESULT				OnSystemMsgSend(WPARAM wParam, LPARAM lParam);//이 함수이름은 아무렇게나 해도, '메시지멥'에 등록만 잘하면 된다.
 	LRESULT				OnSystemMsgAck(WPARAM wParam, LPARAM lParam);
+
+	BOOL				_doesGetAck;
 };

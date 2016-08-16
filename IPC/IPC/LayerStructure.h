@@ -2,7 +2,7 @@
 class LayerStructure
 {
 public:
-	LayerStructure(char* name = NULL);//각 '계층'을 의미하는 객체들은 생성과 동시에 이름이 정해지는게 좋다.
+	LayerStructure(char* pName = NULL);//각 '계층'을 의미하는 객체들은 생성과 동시에 이름이 정해지는게 좋다.
 	~LayerStructure();
 
 	char*				GetLayerName();
@@ -10,8 +10,8 @@ public:
 	LayerStructure*		GetUpperLayer(int index);
 	LayerStructure*		GetUpperLayer();
 	//지금은 상하위 레이어가 하나씩 뿐이지만, 나중에는 상위레이어가 여러개인 경우도 있을 수 있다. 인덱스로 어떤 상위레이어인지 찾는다
-	void				SetUnderLayer(LayerStructure* layer);
-	void				SetUpperLayer(LayerStructure* layer);
+	void				SetUnderLayer(LayerStructure* pLayer = NULL);
+	void				SetUpperLayer(LayerStructure* pLayer = NULL);
 
 	/*
 		위에 있는 공개함수들(SetUnderLayer...등)과는 달리, 아래 두개의 Send Receive함수는
@@ -29,9 +29,9 @@ public:
 	virtual BOOL		Receive(unsigned char* ppayload) { return FALSE; }
 
 protected:
-	char*				_layerName;
-	LayerStructure*		_underLayer;//현재는 레이어가 위아래로 무조건 하나이다.
-	LayerStructure*		_upperLayer;//나중에 다중연결이 필요한 경우에는 배열로 바꿔야 한다.
+	char*				_pLayerName;
+	LayerStructure*		_pUnderLayer;//현재는 레이어가 위아래로 무조건 하나이다.
+	LayerStructure*		_pUpperLayer;//나중에 다중연결이 필요한 경우에는 배열로 바꿔야 한다.
 	int					_upperLayerCount;//이 객체(예를들어, LayerStructure를 상속받은 EthernetLayer의 입장에서)의 직계 상위 레이어가 몇개인지. 지금은 항상 1
 };
 

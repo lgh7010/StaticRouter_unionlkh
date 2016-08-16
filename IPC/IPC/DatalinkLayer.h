@@ -4,7 +4,7 @@
 class DatalinkLayer : public LayerStructure
 {
 public:
-	DatalinkLayer();
+	DatalinkLayer(char* pName);
 	~DatalinkLayer();
 
 	BOOL			Receive(unsigned char* ppayload);

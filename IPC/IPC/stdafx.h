@@ -46,6 +46,7 @@
 #define TP_SEGMENT_DATA_SIZE			( IP_PACKET_DATA_SIZE - TP_SEGMENT_HEADER_SIZE )
 
 #define APP_DATA_SIZE					300
+#define APP_HEADER_SIZE					4//UINT 2개이므로 4바이트
 
 
 #ifdef _UNICODE
