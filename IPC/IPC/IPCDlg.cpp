@@ -270,7 +270,7 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 		int msgLength = this->_message.GetLength();
 		unsigned char* ppayload = new unsigned char[msgLength];//문자열 관련 라이브러리 함수를 사용하기 위해선 맨 끝에 null문자를 넣는게 좋지만, 여기선 필요없다.
 		memcpy(ppayload, (unsigned char*)(LPCTSTR)this->_message, msgLength);
-		this->_pApplicationLayer->Send(ppayload, this->_message.GetLength());
+		this->_pApplicationLayer->Send(ppayload, this->_message.GetLength());//길이는 잘 전달 되는것을 확인했다.
 
 		//시스템의 모든 프로세스에게 메시지를 보낸다. 이 메시지를 받은 IPC프로그램은 물리층에서부터 레이어들을 거쳐 올라오며, 최종적으로 올바른 수신자에게만 메시지를 표시하게 된다
 		::SendMessageA(HWND_BROADCAST, RegSendMsg, 0, 0);
@@ -307,8 +307,8 @@ BOOL CIPCDlg::Receive(unsigned char* ppayload){
 }
 
 LRESULT CIPCDlg::OnSystemMsgSend(WPARAM wParam, LPARAM lParam){
-	this->_pPhysicsLayer->Receive();
 	AfxMessageBox(_T("SystemMsg Send 수신"));
+	this->_pPhysicsLayer->Receive();
 	return 0;
 }
 
