@@ -14,16 +14,16 @@ PhysicsLayer::PhysicsLayer(char* pName) : LayerStructure(pName) {
 }
 PhysicsLayer::~PhysicsLayer(){
 	TRY{
-		CFile::Remove(_T("ipcBuffer.txt"));
+		CFile::Remove("ipcBuffer.txt");
 	}CATCH(CFileException, e){
 		
 	}END_CATCH
 }
 
 BOOL PhysicsLayer::Receive(){
-	AfxMessageBox(_T("¹°¸®Ãþ Receive È£ÃâµÊ"));
+	AfxMessageBox("¹°¸®Ãþ Receive È£ÃâµÊ");
 	TRY{
-		CFile bufFile(_T("ipcBuffer.txt"), CFile::modeRead);
+		CFile bufFile("ipcBuffer.txt", CFile::modeRead);
 		int frameLength = ETHERNET_FRAME_HEADER_SIZE + ETHERNET_FRAME_DATA_SIZE;
 		unsigned char* ppayload = new unsigned char[frameLength + 1];
 
@@ -40,9 +40,9 @@ BOOL PhysicsLayer::Receive(){
 	return TRUE;
 }
 BOOL PhysicsLayer::Send(unsigned char* ppayload, int frameLength){
-	AfxMessageBox(_T("¹°¸®Ãþ Send È£ÃâµÊ"));
+	AfxMessageBox("¹°¸®Ãþ Send È£ÃâµÊ");
 	TRY{
-		CFile bufFile(_T("ipcBuffer.txt"), CFile::modeCreate | CFile::modeWrite);
+		CFile bufFile("ipcBuffer.txt", CFile::modeCreate | CFile::modeWrite);
 		bufFile.Write(ppayload, frameLength);
 		bufFile.Close();
 	}CATCH(CFileException, e) {

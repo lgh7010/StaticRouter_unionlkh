@@ -11,7 +11,7 @@ LayerStructure::~LayerStructure(){}
 //주요 공개함수들
 void LayerStructure::SetUnderLayer(LayerStructure* pLayer) {
 	if (!pLayer) {
-		AfxMessageBox(_T("하위레이어 설정이 비정상작동"));
+		AfxMessageBox("하위레이어 설정이 비정상작동");
 		return;
 	}
 	
@@ -19,7 +19,7 @@ void LayerStructure::SetUnderLayer(LayerStructure* pLayer) {
 }
 void LayerStructure::SetUpperLayer(LayerStructure* pLayer) {
 	if (!pLayer){
-		AfxMessageBox(_T("상위레이어 설정이 비정상작동"));
+		AfxMessageBox("상위레이어 설정이 비정상작동");
 		return;
 	}
 

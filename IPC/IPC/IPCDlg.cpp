@@ -53,11 +53,11 @@ END_MESSAGE_MAP()
 
 CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_IPC_DIALOG, pParent), LayerStructure("DLG")
-	, _message(_T(""))
+	, _message("")
 	, _isBroadcastMode(FALSE)
 	, _srcAddress(0)
 	, _dstAddress(0)
-	, _chatList()//_T("")왜 이게 매개로 기본적으로 들어가있었던거지
+	, _chatList()//("")왜 이게 매개로 기본적으로 들어가있었던거지
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 	/*
@@ -163,8 +163,8 @@ BOOL CIPCDlg::OnInitDialog()
 	this->_sendButton.EnableWindow(FALSE);//이걸 위에서 초기화하는거 다 넣는곳에 넣으려고 했는데 그러면 에러가 나서 할수없이 여기에 넣었다.
 
 	//System메시지 설정. 이걸 Dlg생성자에서 하면 당연히 선언되어있지 않다는 빌드에러가 뜬다. 그래서 여기에 둔다.
-	RegSendMsg = RegisterWindowMessage(_T("SendMsg"));
-	RegAckMsg = RegisterWindowMessage(_T("AckMsg"));
+	RegSendMsg = RegisterWindowMessage("SendMsg");
+	RegAckMsg = RegisterWindowMessage("AckMsg");
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	// TODO: Add extra initialization here
@@ -224,7 +224,7 @@ void CIPCDlg::OnBnClickedButtonSet(){//Set버튼을 누른 경우의 작동
 	UpdateData(TRUE);
 
 	if (this->_sendReady) {//리셋을 누르는 경우임
-		this->_setResetButton.SetWindowTextW(_T("Set"));
+		this->_setResetButton.SetWindowText("Set");
 		this->_sendReady = FALSE;
 
 		this->_dstAddressPanel.EnableWindow(TRUE);
@@ -233,11 +233,11 @@ void CIPCDlg::OnBnClickedButtonSet(){//Set버튼을 누른 경우의 작동
 		this->_sendButton.EnableWindow(FALSE);
 	} else {//셋을 누르는 경우임
 		if (!this->_srcAddress || !this->_dstAddress) {
-			MessageBox(_T("주소가 올바르지 않습니다."), _T("경고"), MB_OK | MB_ICONSTOP);
+			MessageBox("주소가 올바르지 않습니다.", "경고", MB_OK | MB_ICONSTOP);
 			return;
 		}
 
-		this->_setResetButton.SetWindowTextW(_T("Reset"));
+		this->_setResetButton.SetWindowText("Reset");
 		this->_sendReady = TRUE;
 		this->_pApplicationLayer->SetSrcAddress(this->_srcAddress);
 		this->_pApplicationLayer->SetDstAddress(this->_dstAddress);
@@ -259,17 +259,22 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 		//호스트에서의 채팅 처리
 		CString msgFront;
 		if (this->_isBroadcastMode) {
-			msgFront.Format(_T("[%d:BROADCAST] "), this->_srcAddress);
+			msgFront.Format("[%d:BROADCAST] ", this->_srcAddress);
 		} else {
-			msgFront.Format(_T("[%d:%d] "), this->_srcAddress, this->_dstAddress);
+			msgFront.Format("[%d:%d] ", this->_srcAddress, this->_dstAddress);
 		}
 		this->_chatList.AddString(msgFront + this->_message);
 
 		//송신 처리
-		this->_doesGetAck = FALSE;//수신자가 브로드캐스트된 레지스터메시지를 받으면 ACK 메시지를 브로드캐스트하는데, 그걸 받으면 이걸 TRUE로 바꾼다. 이 변수는 최초 송신자가 자신이 보낸걸 수신자가 잘 받았는지 안받았는지 체크한다.
+		this->_doesGetAck = FALSE;//수신자가 브로드캐스트된 레지스터메시지를 받으면 ACK 메시지를 브로드캐스트하는데, 그걸 받으면 이걸 TRUE로 바꾼다. 이 변수는 최초 송신자가 자신이 보낸걸 수신자가 잘 받았는지 안받았는지 체크한다.																
+
 		int msgLength = this->_message.GetLength();
-		unsigned char* ppayload = new unsigned char[msgLength];//문자열 관련 라이브러리 함수를 사용하기 위해선 맨 끝에 null문자를 넣는게 좋지만, 여기선 필요없다.
+		unsigned char* ppayload = new unsigned char[msgLength + 1];
 		memcpy(ppayload, (unsigned char*)(LPCTSTR)this->_message, msgLength);
+		ppayload[msgLength] = '\0';
+
+		this->_pApplicationLayer->SetDstAddress(this->_dstAddress);//어플리케이션층의 헤더 정보를 만들어 주고 나서, Send로 '데이터'를 전송한다.
+		this->_pApplicationLayer->SetSrcAddress(this->_srcAddress);//즉, 여기서 ppayload는 오로지 유저가 입력한 문자열 데이터만을 의미한다.
 		this->_pApplicationLayer->Send(ppayload, this->_message.GetLength());//길이는 잘 전달 되는것을 확인했다.
 
 		//시스템의 모든 프로세스에게 메시지를 보낸다. 이 메시지를 받은 IPC프로그램은 물리층에서부터 레이어들을 거쳐 올라오며, 최종적으로 올바른 수신자에게만 메시지를 표시하게 된다
@@ -286,13 +291,13 @@ void CIPCDlg::OnCheckBroadcast(){
 	if (this->_isBroadcastMode) {
 		UpdateData(TRUE);
 		this->_dstAddress = 0;
-		this->_dstAddressPanel.SetWindowTextW(_T("0"));
+		this->_dstAddressPanel.SetWindowText("0");
 		this->_dstAddressPanel.EnableWindow(TRUE);
 		this->_isBroadcastMode = FALSE;
 	} else {
 		UpdateData(TRUE);
 		this->_dstAddress = (unsigned int)0xff;
-		this->_dstAddressPanel.SetWindowTextW(_T("255"));
+		this->_dstAddressPanel.SetWindowText("255");
 		this->_dstAddressPanel.EnableWindow(FALSE);
 		this->_isBroadcastMode = TRUE;
 	}
@@ -302,18 +307,18 @@ BOOL CIPCDlg::Receive(unsigned char* ppayload){
 	if (!this->_doesGetAck)
 		::SendMessageA(HWND_BROADCAST, RegAckMsg, 0, 0);
 	
-	this->_chatList.AddString( (LPCTSTR)(char*) ppayload);
+	this->_chatList.AddString((char*) ppayload);
 	return TRUE;
 }
 
 LRESULT CIPCDlg::OnSystemMsgSend(WPARAM wParam, LPARAM lParam){
-	AfxMessageBox(_T("SystemMsg Send 수신"));
+	AfxMessageBox("SystemMsg Send 수신");
 	this->_pPhysicsLayer->Receive();
 	return 0;
 }
 
 LRESULT CIPCDlg::OnSystemMsgAck(WPARAM wParam, LPARAM lParam) {
-	AfxMessageBox(_T("ACK 수신"));
+	AfxMessageBox("ACK 수신");
 	if (!this->_doesGetAck) {
 		this->_doesGetAck = TRUE;
 	}

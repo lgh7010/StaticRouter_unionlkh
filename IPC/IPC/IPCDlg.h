@@ -60,7 +60,7 @@ private:
 	CString				_message;				// 유저가 입력한 채팅 메시지
 	CButton				_broadcastPanel;
 	BOOL				_isBroadcastMode;
-	UINT				_srcAddress;
+	UINT				_srcAddress;			// 이건 소스주소, 목적지주소를 입력하는 창에 있는 값을 의미하는것이다.
 	UINT				_dstAddress;
 	CEdit				_srcAddressPanel;
 	CEdit				_dstAddressPanel;
