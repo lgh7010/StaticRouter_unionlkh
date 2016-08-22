@@ -67,6 +67,9 @@ CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
 	this->_sendReady = FALSE;
 	this->_doesGetAck = FALSE;
 	//this->_sendButton.EnableWindow(FALSE);//이걸 왜 여기서 하면 에러가 나는거지? 아마 대화상자가 제대로 만들어지기 전에 그걸 Disable부터 하려고 해서인듯
+	this->_currentMessageSize = 0;
+	this->_currentMessageSrcAddress = 0;
+	this->_currentMessageDstAddress = 0;
 
 	//각 레이어 객체를 만들고, 서로 상/하위 관계 설정
 	this->_pPhysicsLayer = new PhysicsLayer("PHY");
@@ -135,6 +138,7 @@ BEGIN_MESSAGE_MAP(CIPCDlg, CDialogEx)
 	//On_REGISTERED_MESSAGE(메시지, 해당 메시지로 동작시킬 함수이름)인듯
 	ON_REGISTERED_MESSAGE(RegSendMsg, &CIPCDlg::OnSystemMsgSend)
 	ON_REGISTERED_MESSAGE(RegAckMsg, &CIPCDlg::OnSystemMsgAck)
+	ON_WM_TIMER()
 	
 END_MESSAGE_MAP()
 
@@ -277,7 +281,8 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 		this->_chatList.AddString(msgFront + this->_message);
 
 		//송신 처리
-		this->_doesGetAck = FALSE;//수신자가 브로드캐스트된 레지스터메시지를 받으면 ACK 메시지를 브로드캐스트하는데, 그걸 받으면 이걸 TRUE로 바꾼다. 이 변수는 최초 송신자가 자신이 보낸걸 수신자가 잘 받았는지 안받았는지 체크한다.																
+		//this->_doesGetAck = FALSE;//수신자가 브로드캐스트된 레지스터메시지를 받으면 ACK 메시지를 브로드캐스트하는데, 그걸 받으면 이걸 TRUE로 바꾼다. 이 변수는 최초 송신자가 자신이 보낸걸 수신자가 잘 받았는지 안받았는지 체크한다.																
+		SetTimer(1, 2000, NULL);
 
 		int msgLength = this->_message.GetLength();
 		unsigned char* ppayload = new unsigned char[msgLength + 1];
@@ -286,7 +291,8 @@ void CIPCDlg::OnBnClickedButtonSend(){//Send버튼을 누른 경우의 작동
 
 		this->_pApplicationLayer->SetDstAddress(this->_dstAddress);//어플리케이션층의 헤더 정보를 만들어 주고 나서, Send로 '데이터'를 전송한다.
 		this->_pApplicationLayer->SetSrcAddress(this->_srcAddress);//즉, 여기서 ppayload는 오로지 유저가 입력한 문자열 데이터만을 의미한다.
-		this->_pApplicationLayer->Send(ppayload, this->_message.GetLength());//길이는 잘 전달 되는것을 확인했다.
+		this->_pApplicationLayer->SetSize(msgLength);
+		this->_pApplicationLayer->Send(ppayload, msgLength);//길이는 잘 전달 되는것을 확인했다.
 
 		//시스템의 모든 프로세스에게 메시지를 보낸다. 이 메시지를 받은 IPC프로그램은 물리층에서부터 레이어들을 거쳐 올라오며, 최종적으로 올바른 수신자에게만 메시지를 표시하게 된다
 		::SendMessageA(HWND_BROADCAST, RegSendMsg, 0, 0);
@@ -313,44 +319,58 @@ void CIPCDlg::OnCheckBroadcast(){
 		this->_isBroadcastMode = TRUE;
 	}
 }
-
+/*
+	어떤 메시지든 ApplicationLayer의 Receive까지는 올라오지만, Dlg의 Receive에 들어오는건 '이녀석에게 온' 메시지 뿐이다.
+*/
 BOOL CIPCDlg::Receive(unsigned char* ppayload){
-	if (!this->_doesGetAck)
+	/*if (!this->_doesGetAck) {
+		this->_doesGetAck = TRUE;
 		::SendMessageA(HWND_BROADCAST, RegAckMsg, 0, 0);
+	}*/
+	::SendMessageA(HWND_BROADCAST, RegAckMsg, 0, 0);
 
 	unsigned char* buffer = new unsigned char[APP_DATA_SIZE];//하위에서 Receive로 올려보내는건, 어쨋든 APP자료구조의 data부분이므로 이 크기를 넘지 않음
 	memset(buffer, '\0', APP_DATA_SIZE);
-	memcpy(buffer, ppayload, APP_DATA_SIZE);
+	memcpy(buffer, ppayload, this->_currentMessageSize);
 
-	CString currentMessage;
+	CString messageFormat;
 	if (this->_currentMessageDstAddress == 0xff) {
-		currentMessage.Format("[%d:BROADCAST] %s", this->_currentMessageSrcAddress, buffer);
+		messageFormat.Format("[%d:BROADCAST] %s", this->_currentMessageSrcAddress, buffer);
 	} else {
-		currentMessage.Format("[%d:%d] %s", this->_currentMessageSrcAddress, this->_currentMessageDstAddress, buffer);
+		messageFormat.Format("[%d:%d] %s", this->_currentMessageSrcAddress, this->_currentMessageDstAddress, buffer);
 	}
 	
-	this->_chatList.AddString(currentMessage);
+	this->_chatList.AddString(messageFormat);
 	return TRUE;
 }
 
 void CIPCDlg::SetCurrentMessageSrcAddress(UINT n){
 	this->_currentMessageSrcAddress = n;
 }
-
 void CIPCDlg::SetCurrentMessageDstAddress(UINT n){
 	this->_currentMessageDstAddress = n;
 }
+void CIPCDlg::SetCurrentMessageSize(int n) {
+	this->_currentMessageSize = n;
+}
 
 LRESULT CIPCDlg::OnSystemMsgSend(WPARAM wParam, LPARAM lParam){
-	AfxMessageBox("SystemMsg Send 수신");
+	//AfxMessageBox("SystemMsg Send 수신");
 	this->_pPhysicsLayer->Receive();
 	return 0;
 }
 
 LRESULT CIPCDlg::OnSystemMsgAck(WPARAM wParam, LPARAM lParam) {
-	AfxMessageBox("ACK 수신");
-	if (!this->_doesGetAck) {
+	//AfxMessageBox("ACK 수신");
+	/*if (!this->_doesGetAck) {
 		this->_doesGetAck = TRUE;
-	}
+	}*/
+	KillTimer(1);
 	return 0;
+}
+
+void CIPCDlg::OnTimer(UINT nIDEvent) {
+	this->_chatList.AddString("Transfer Failed : TIME OUT");
+	KillTimer(1);
+	CDialog::OnTimer(nIDEvent);
 }

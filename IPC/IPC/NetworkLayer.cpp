@@ -12,7 +12,7 @@ void NetworkLayer::Refresh() {}
 
 
 BOOL NetworkLayer::Receive(unsigned char * ppayload){
-	AfxMessageBox("³×Æ®¿öÅ©Ãþ Receive È£ÃâµÊ");
+	//AfxMessageBox("³×Æ®¿öÅ©Ãþ Receive È£ÃâµÊ");
 	PACKET*	pPacket = (PACKET*)ppayload;
 
 	BOOL isDone;
@@ -21,7 +21,7 @@ BOOL NetworkLayer::Receive(unsigned char * ppayload){
 }
 
 BOOL NetworkLayer::Send(unsigned char * ppayload, int segmentLength){
-	AfxMessageBox("³×Æ®¿öÅ©Ãþ Send È£ÃâµÊ");
+	//AfxMessageBox("³×Æ®¿öÅ©Ãþ Send È£ÃâµÊ");
 	memcpy(this->_packet.IP_data, ppayload, segmentLength);
 
 	BOOL isDone;

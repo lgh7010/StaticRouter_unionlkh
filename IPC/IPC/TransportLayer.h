@@ -19,7 +19,7 @@ public:
 		unsigned short	SG_HLRFLG;//HeaderLength, Reserved, Flags
 		unsigned short	SG_winSize;
 		unsigned short	SG_checkSum;
-		unsigned short	SG_urgentPoint;
+		unsigned short	SG_urgentPoint;//위에서부터 여기까지 20바이트
 		unsigned char	SG_optionAndPadding[TP_SEGMENT_OP_SIZE];//일단 4바이트라고 가정한다.
 		unsigned char	SG_data[TP_SEGMENT_DATA_SIZE];
 	};

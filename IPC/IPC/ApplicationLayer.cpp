@@ -13,7 +13,7 @@ void ApplicationLayer::Refresh() {
 }
 
 BOOL ApplicationLayer::Receive(unsigned char * ppayload){
-	AfxMessageBox("어플리케이션 Receive 호출됨");
+	//AfxMessageBox("어플리케이션 Receive 호출됨");
 	APPDATA* appdata = (APPDATA*)ppayload;
 	
 	//주소체크. 현재는 네트워크로 통신이 이뤄지는 내용이 전혀 없기 때문에, 다른 레이어에서는 아무것도 하지 않고 Application에서만 주소체크를 한다.
@@ -46,9 +46,10 @@ BOOL ApplicationLayer::Receive(unsigned char * ppayload){
 	//IPCDlg에서 전달받은 채팅메시지(appdata->_data)에다가 올바른 주소 형식을 붙여서([1:2] blabla..)출력할 수 있도록, APP헤더의 주소정보 전달
 	//this->_pIPCDlg->SetCurrentMessageDstAddress(appdata->_dstAddress);
 	//this->_pIPCDlg->SetCurrentMessageSrcAddress(appdata->_srcAddress);//와 시발 이게 뭐야. 이런게 문제가 생겨서 아래처럼 그냥 그때그때 상위레이어 참조해서 형변환 했더니 빌드에러는 안나네
+	//시발 뭐지 위에거는 안되고(말도안되는 신택스 빌드에러_알수없는 문제) 아래거는 되는거지
 	((CIPCDlg*)this->GetUpperLayer())->SetCurrentMessageDstAddress(appdata->_dstAddress);
 	((CIPCDlg*)this->GetUpperLayer())->SetCurrentMessageSrcAddress(appdata->_srcAddress);
-	//시발 뭐지 위에거는 안되고(말도안되는 신택스 빌드에러_알수없는 문제) 아래거는 되는거지
+	((CIPCDlg*)this->GetUpperLayer())->SetCurrentMessageSize(appdata->_dataSize);
 
 	BOOL isDone;
 	isDone = this->_pUpperLayer->Receive((unsigned char*)appdata->_data);
@@ -56,7 +57,7 @@ BOOL ApplicationLayer::Receive(unsigned char * ppayload){
 }
 
 BOOL ApplicationLayer::Send(unsigned char * ppayload, int appdataSize){
-	AfxMessageBox("어플리케이션 Send 호출됨");
+	//AfxMessageBox("어플리케이션 Send 호출됨");
 	memcpy(this->_appdata._data, ppayload, appdataSize);
 
 	BOOL isDone;
@@ -73,16 +74,23 @@ void ApplicationLayer::SetDstAddress(unsigned int address){
 void ApplicationLayer::SetSrcAddress(unsigned int address){
 	this->_appdata._srcAddress = address;
 }
+void ApplicationLayer::SetSize(int size) {
+	this->_appdata._dataSize = size;
+}
 UINT ApplicationLayer::GetDstAddress(){
 	return this->_appdata._dstAddress;
 }
 UINT ApplicationLayer::GetSrcAddress(){
 	return this->_appdata._srcAddress;
 }
+UINT ApplicationLayer::GetSize() {
+	return this->_appdata._dataSize;
+}
 
 
 void ApplicationLayer::ResetHeader(){
 	this->_appdata._srcAddress = 0;
 	this->_appdata._dstAddress = 0;
+	this->_appdata._dataSize = 0;
 	memset(this->_appdata._data, 0, APP_DATA_SIZE);
 }

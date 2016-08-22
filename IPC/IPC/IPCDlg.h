@@ -53,12 +53,14 @@ public:
 	afx_msg void OnBnClickedButtonSet();
 	afx_msg void OnBnClickedButtonSend();
 	afx_msg void OnCheckBroadcast();
+	afx_msg void OnTimer(UINT nIDEvent);
 
 	BOOL				Receive(unsigned char* ppayload);
 	void				Refresh();
 
 	void				SetCurrentMessageSrcAddress(UINT n);
 	void				SetCurrentMessageDstAddress(UINT n);
+	void				SetCurrentMessageSize(int n);
 
 private:
 	CString				_message;				// 유저가 입력한 채팅 메시지
@@ -79,4 +81,5 @@ private:
 
 	UINT				_currentMessageSrcAddress;
 	UINT				_currentMessageDstAddress;
+	int					_currentMessageSize;
 };

@@ -10,7 +10,7 @@ TransportLayer::~TransportLayer(){}
 void TransportLayer::Refresh() {}
 
 BOOL TransportLayer::Receive(unsigned char * ppayload){
-	AfxMessageBox("트랜스포트층 Receive");
+	//AfxMessageBox("트랜스포트층 Receive");
 	SEGMENT* pSegment = (SEGMENT*)ppayload;
 
 	BOOL isDone;
@@ -19,7 +19,7 @@ BOOL TransportLayer::Receive(unsigned char * ppayload){
 }
 
 BOOL TransportLayer::Send(unsigned char * ppayload, int applicationDataSize){
-	AfxMessageBox("트랜스포트층 Send");
+	//AfxMessageBox("트랜스포트층 Send");
 	memcpy(this->_segment.SG_data, ppayload, applicationDataSize);
 
 	BOOL isDone;

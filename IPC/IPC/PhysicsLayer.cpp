@@ -22,7 +22,7 @@ PhysicsLayer::~PhysicsLayer(){
 void PhysicsLayer::Refresh() {}
 
 BOOL PhysicsLayer::Receive(){
-	AfxMessageBox("¹°¸®Ãþ Receive È£ÃâµÊ");
+	//AfxMessageBox("¹°¸®Ãþ Receive È£ÃâµÊ");
 	TRY{
 		CFile bufFile("ipcBuffer.txt", CFile::modeRead);
 		int frameLength = ETHERNET_FRAME_HEADER_SIZE + ETHERNET_FRAME_DATA_SIZE;
@@ -41,7 +41,7 @@ BOOL PhysicsLayer::Receive(){
 	return TRUE;
 }
 BOOL PhysicsLayer::Send(unsigned char* ppayload, int frameLength){
-	AfxMessageBox("¹°¸®Ãþ Send È£ÃâµÊ");
+	//AfxMessageBox("¹°¸®Ãþ Send È£ÃâµÊ");
 	TRY{
 		CFile bufFile("ipcBuffer.txt", CFile::modeCreate | CFile::modeWrite);
 		bufFile.Write(ppayload, frameLength);
