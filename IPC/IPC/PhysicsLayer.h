@@ -9,5 +9,6 @@ public:
 
 	BOOL	Receive();
 	BOOL	Send(unsigned char* ppayload, int frameLength);
+	void	Refresh();
 };
 

@@ -5,7 +5,8 @@
 DatalinkLayer::DatalinkLayer(char* pName) : LayerStructure(pName){
 	this->ResetFrame();
 }
-DatalinkLayer::~DatalinkLayer(){}
+DatalinkLayer::~DatalinkLayer() {}
+void DatalinkLayer::Refresh() {}
 
 /*							<Receive 설명>
 1. 하위레이어(Physics)에서 '프레임'이 올라오면, 그 프레임에서 '이더넷 헤더부분'을 제거한다

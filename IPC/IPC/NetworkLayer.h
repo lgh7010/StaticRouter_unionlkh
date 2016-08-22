@@ -8,8 +8,8 @@ public:
 	~NetworkLayer();
 
 	BOOL			Receive(unsigned char* ppayload);
-	BOOL			Send(unsigned char* ppayload, int segmentLength);
-	//트랜스포트층의 자료구조 이름은 '세그먼트'이다. 따라서, 트랜스포트층에서 네트워크 층으로 내려오는 자료구조의 길이를 segmentLength라고 하자.
+	BOOL			Send(unsigned char* ppayload, int segmentLength);	//트랜스포트층의 자료구조 이름은 '세그먼트'이다. 따라서, 트랜스포트층에서 네트워크 층으로 내려오는 자료구조의 길이를 segmentLength라고 하자.
+	void			Refresh();
 
 	void			SetDstAddress(unsigned char* pAddress);
 	void			SetSrcAddress(unsigned char* pAddress);

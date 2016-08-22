@@ -19,6 +19,7 @@ PhysicsLayer::~PhysicsLayer(){
 		
 	}END_CATCH
 }
+void PhysicsLayer::Refresh() {}
 
 BOOL PhysicsLayer::Receive(){
 	AfxMessageBox("¹°¸®Ãþ Receive È£ÃâµÊ");

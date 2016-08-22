@@ -55,6 +55,10 @@ public:
 	afx_msg void OnCheckBroadcast();
 
 	BOOL				Receive(unsigned char* ppayload);
+	void				Refresh();
+
+	void				SetCurrentMessageSrcAddress(UINT n);
+	void				SetCurrentMessageDstAddress(UINT n);
 
 private:
 	CString				_message;				// 유저가 입력한 채팅 메시지
@@ -72,4 +76,7 @@ private:
 	LRESULT				OnSystemMsgAck(WPARAM wParam, LPARAM lParam);
 
 	BOOL				_doesGetAck;
+
+	UINT				_currentMessageSrcAddress;
+	UINT				_currentMessageDstAddress;
 };

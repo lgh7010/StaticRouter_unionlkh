@@ -76,6 +76,7 @@ CIPCDlg::CIPCDlg(CWnd* pParent /*=NULL*/)
 	this->_pApplicationLayer = new ApplicationLayer("APP");
 
 	this->LinkLayers();
+	this->Refresh();
 }
 void CIPCDlg::LinkLayers() {
 	this->_pPhysicsLayer->SetUpperLayer(this->_pDatalinkLayer);
@@ -93,6 +94,16 @@ void CIPCDlg::LinkLayers() {
 	this->_pApplicationLayer->SetUpperLayer(this);
 	this->SetUnderLayer(this->_pApplicationLayer);
 }
+
+
+void CIPCDlg::Refresh() {
+	this->_pPhysicsLayer->Refresh();
+	this->_pDatalinkLayer->Refresh();
+	this->_pNetworkLayer->Refresh();
+	this->_pTransportLayer->Refresh();
+	this->_pApplicationLayer->Refresh();
+}
+
 
 void CIPCDlg::DoDataExchange(CDataExchange* pDX)
 {
@@ -306,9 +317,28 @@ void CIPCDlg::OnCheckBroadcast(){
 BOOL CIPCDlg::Receive(unsigned char* ppayload){
 	if (!this->_doesGetAck)
 		::SendMessageA(HWND_BROADCAST, RegAckMsg, 0, 0);
+
+	unsigned char* buffer = new unsigned char[APP_DATA_SIZE];//하위에서 Receive로 올려보내는건, 어쨋든 APP자료구조의 data부분이므로 이 크기를 넘지 않음
+	memset(buffer, '\0', APP_DATA_SIZE);
+	memcpy(buffer, ppayload, APP_DATA_SIZE);
+
+	CString currentMessage;
+	if (this->_currentMessageDstAddress == 0xff) {
+		currentMessage.Format("[%d:BROADCAST] %s", this->_currentMessageSrcAddress, buffer);
+	} else {
+		currentMessage.Format("[%d:%d] %s", this->_currentMessageSrcAddress, this->_currentMessageDstAddress, buffer);
+	}
 	
-	this->_chatList.AddString((char*) ppayload);
+	this->_chatList.AddString(currentMessage);
 	return TRUE;
+}
+
+void CIPCDlg::SetCurrentMessageSrcAddress(UINT n){
+	this->_currentMessageSrcAddress = n;
+}
+
+void CIPCDlg::SetCurrentMessageDstAddress(UINT n){
+	this->_currentMessageDstAddress = n;
 }
 
 LRESULT CIPCDlg::OnSystemMsgSend(WPARAM wParam, LPARAM lParam){

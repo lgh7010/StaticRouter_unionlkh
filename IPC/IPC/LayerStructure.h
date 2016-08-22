@@ -28,6 +28,8 @@ public:
 	virtual BOOL		Send(unsigned char*, int) { return FALSE; }//다만 virtual로 선언할 때는, 이렇게 '기본 리턴값'을 지정해줘야 한다.
 	virtual BOOL		Receive(unsigned char* ppayload) { return FALSE; }
 
+	virtual void		Refresh() {};//각 레이어 객체가 생성되고, 연결된 뒤에 해야 할 작업들이 있다면 여기에 적는다. 생성자가 Awake라면, 이녀석은 Start인 셈
+
 protected:
 	char*				_pLayerName;
 	LayerStructure*		_pUnderLayer;//현재는 레이어가 위아래로 무조건 하나이다.

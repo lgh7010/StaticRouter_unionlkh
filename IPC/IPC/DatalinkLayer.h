@@ -10,6 +10,7 @@ public:
 	BOOL			Receive(unsigned char* ppayload);
 	BOOL			Send(unsigned char* ppayload, int packetLength);//이더넷 레이어로 내려와서, 이더넷 레이어가 자신의 프레임의 Data에 넣어야 하는건 packet이다. 그래서 packetSize다
 	//엄밀히, 네트워크층의 자료구조를 부르는 이름은 '패킷'이 아니라 '데이터그램'이다. 패킷은 IP프로토콜이 사용하는 자료구조를 말한다. 그러나 오늘날 네트워크층의 프로토콜은 전부 IP이므로, 그냥 네트워크층의 자료구조를 패킷이라 부른다.
+	void			Refresh();
 
 	void			SetDstAddress(unsigned char* pAddress);
 	void			SetSrcAddress(unsigned char* pAddress);

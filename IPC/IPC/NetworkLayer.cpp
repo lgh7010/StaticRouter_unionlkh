@@ -5,7 +5,8 @@
 NetworkLayer::NetworkLayer(char* pName) : LayerStructure(pName){
 	this->ResetHeader();
 }
-NetworkLayer::~NetworkLayer(){}
+NetworkLayer::~NetworkLayer() {}
+void NetworkLayer::Refresh() {}
 
 
 

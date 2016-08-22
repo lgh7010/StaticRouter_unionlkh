@@ -7,6 +7,8 @@ TransportLayer::TransportLayer(char* pName) : LayerStructure(pName){
 }
 TransportLayer::~TransportLayer(){}
 
+void TransportLayer::Refresh() {}
+
 BOOL TransportLayer::Receive(unsigned char * ppayload){
 	AfxMessageBox("트랜스포트층 Receive");
 	SEGMENT* pSegment = (SEGMENT*)ppayload;

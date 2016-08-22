@@ -9,6 +9,7 @@ public:
 
 	BOOL			Receive(unsigned char* ppayload);
 	BOOL			Send(unsigned char* ppayload, int applicationDataSize);
+	void			Refresh();
 
 	typedef struct SEGMENT {
 		unsigned short	SG_srcPort;
