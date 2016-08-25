@@ -74,6 +74,9 @@ hlp\afxcore.htm
     This file contains the standard help topics for standard MFC
     commands and screen objects. Add your own help topics to this file.
 
+hlp\afxprint.htm
+    This file contains the help topics for the printing commands.
+
 makehtmlhelp.bat
     This file is used by the build system to compile the help files.
 
@@ -88,6 +91,10 @@ Other Features:
 
 ActiveX Controls
     The application includes support to use ActiveX controls.
+
+Printing and Print Preview support
+    The application wizard has generated code to handle the print, print setup, and print preview
+    commands by calling member functions in the CView class from the MFC library.
 
 /////////////////////////////////////////////////////////////////////////////
 

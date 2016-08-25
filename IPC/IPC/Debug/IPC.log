@@ -3,6 +3,13 @@ c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\datalinklayer.h(25
 c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\networklayer.h(32): warning C4091: 'typedef ': ignored on left of 'NetworkLayer::PACKET' when no variable is declared
 c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\transportlayer.h(25): warning C4091: 'typedef ': ignored on left of 'TransportLayer::SEGMENT' when no variable is declared
 c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\applicationlayer.h(29): warning C4091: 'typedef ': ignored on left of 'ApplicationLayer::APPDATA' when no variable is declared
-  LINK : C:\Users\union\Documents\GitHub\StaticRouter_unionlkh\IPC\Debug\IPC.exe not found or not built by the last incremental link; performing full link
+  IPC.cpp
+c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\datalinklayer.h(25): warning C4091: 'typedef ': ignored on left of 'DatalinkLayer::ETHERNET_FRAME' when no variable is declared
+c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\networklayer.h(32): warning C4091: 'typedef ': ignored on left of 'NetworkLayer::PACKET' when no variable is declared
+c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\transportlayer.h(25): warning C4091: 'typedef ': ignored on left of 'TransportLayer::SEGMENT' when no variable is declared
+c:\users\union\documents\github\staticrouter_unionlkh\ipc\ipc\applicationlayer.h(29): warning C4091: 'typedef ': ignored on left of 'ApplicationLayer::APPDATA' when no variable is declared
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  ApplicationLayer.cpp
   IPC.vcxproj -> C:\Users\union\Documents\GitHub\StaticRouter_unionlkh\IPC\Debug\IPC.exe
   IPC.vcxproj -> C:\Users\union\Documents\GitHub\StaticRouter_unionlkh\IPC\Debug\IPC.pdb (Full PDB)
