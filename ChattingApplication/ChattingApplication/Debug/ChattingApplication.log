@@ -1,3 +1,9 @@
-﻿  ChattingApplicationDlg.cpp
+﻿  DatalinkLayer.cpp
+c:\users\union\documents\github\staticrouter_unionlkh\chattingapplication\chattingapplication\datalinklayer.h(32): warning C4091: 'typedef ': ignored on left of 'DatalinkLayer::ETHERNET_FRAME' when no variable is declared
+  Generating Code...
+  Skipping... (no relevant changes detected)
+  ChattingApplicationDlg.cpp
+  ChattingApplication.cpp
+  ApplicationLayer.cpp
   ChattingApplication.vcxproj -> C:\Users\union\Documents\GitHub\StaticRouter_unionlkh\ChattingApplication\Debug\ChattingApplication.exe
   ChattingApplication.vcxproj -> C:\Users\union\Documents\GitHub\StaticRouter_unionlkh\ChattingApplication\Debug\ChattingApplication.pdb (Partial PDB)

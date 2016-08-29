@@ -48,8 +48,8 @@ public:
 	BOOL				Receive(unsigned char* ppayload);
 	void				Refresh();
 
-	void				SetCurrentMessageSrcAddress(UINT n);
-	void				SetCurrentMessageDstAddress(UINT n);
+	void				SetCurrentMessageSrcAddress(unsigned char* pAddress);
+	void				SetCurrentMessageDstAddress(unsigned char* pAddress);
 	void				SetCurrentMessageSize(int n);
 
 private:
@@ -70,11 +70,11 @@ private:
 	ApplicationLayer*	_pApplicationLayer;
 	void				LinkLayers();
 
-	BOOL			_sendReady;
-	unsigned char	_srcAddress[4];
-	unsigned char	_dstAddress[4];
+	BOOL				_sendReady;
+	unsigned char		_srcAddress[4];
+	unsigned char		_dstAddress[4];
 
-	UINT				_currentMessageSrcAddress;
-	UINT				_currentMessageDstAddress;
+	unsigned char		_currentMessageSrcAddress[4];
+	unsigned char		_currentMessageDstAddress[4];
 	int					_currentMessageSize;
 };

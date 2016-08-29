@@ -12,18 +12,18 @@ public:
 	BOOL			Send(unsigned char* ppayload, int appdataSize);
 	void			Refresh();
 
-	void			SetDstAddress(unsigned int address);
-	void			SetSrcAddress(unsigned int address);
+	void			SetDstAddress(unsigned char* address);
+	void			SetSrcAddress(unsigned char* address);
 	void			SetSize(int size);
-	UINT			GetDstAddress();
-	UINT			GetSrcAddress();
+	unsigned char*	GetDstAddress();
+	unsigned char*	GetSrcAddress();
 	UINT			GetSize();
 
 private:
 	void			ResetHeader();
 	typedef struct APPDATA {
-		UINT			_srcAddress;			//4바이트
-		UINT			_dstAddress;			//4바이트
+		unsigned char	_srcAddress[4];			//4바이트
+		unsigned char	_dstAddress[4];			//4바이트
 		int				_dataSize;				//4바이트
 		unsigned char	_data[APP_DATA_SIZE];
 	};
