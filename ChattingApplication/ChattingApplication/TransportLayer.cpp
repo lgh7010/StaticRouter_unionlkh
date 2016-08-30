@@ -19,6 +19,7 @@ BOOL TransportLayer::Receive(unsigned char * ppayload) {
 		isDone = this->GetUpperLayer()->Receive((unsigned char*)pSegment->SG_data);
 		return isDone;
 	} else {
+		//AfxMessageBox("트랜스포트층 Receive : 포트주소 불일치");
 		return FALSE;
 	}
 }
@@ -33,6 +34,14 @@ BOOL TransportLayer::Send(unsigned char * ppayload, int applicationDataSize) {
 	return isDone;
 }
 
+unsigned short TransportLayer::getSrcPort(){
+	return this->_segment.SG_srcPort;
+}
+
+unsigned short TransportLayer::getDstPort(){
+	return this->_segment.SG_dstPort;
+}
+
 void TransportLayer::ResetHeader() {
 	this->_segment.SG_srcPort = 0;
 	this->_segment.SG_dstPort = 0;
@@ -45,3 +54,4 @@ void TransportLayer::ResetHeader() {
 	memset(this->_segment.SG_optionAndPadding, 0, TP_SEGMENT_OP_SIZE);
 	memset(this->_segment.SG_data, 0, TP_SEGMENT_DATA_SIZE);
 }
+

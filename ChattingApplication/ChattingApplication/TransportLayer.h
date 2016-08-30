@@ -24,8 +24,11 @@ public:
 		unsigned char	SG_data[TP_SEGMENT_DATA_SIZE];
 	};
 
+	unsigned short		getSrcPort();//테스트용 삭제요망
+	unsigned short		getDstPort();
+
 private:
-	void		ResetHeader();
-	SEGMENT		_segment;
+	void				ResetHeader();
+	SEGMENT				_segment;
 };
 
