@@ -4,6 +4,7 @@
 
 TransportLayer::TransportLayer(char* pName) : LayerStructure(pName) {
 	this->ResetHeader();
+	this->_segment.SG_srcPort = 567;//테스트를 위함
 }
 TransportLayer::~TransportLayer() {}
 
@@ -13,14 +14,19 @@ BOOL TransportLayer::Receive(unsigned char * ppayload) {
 	//AfxMessageBox("트랜스포트층 Receive");
 	SEGMENT* pSegment = (SEGMENT*)ppayload;
 
-	BOOL isDone;
-	isDone = this->GetUpperLayer()->Receive((unsigned char*)pSegment->SG_data);
-	return isDone;
+	if (pSegment->SG_dstPort == this->_segment.SG_srcPort) {
+		BOOL isDone;
+		isDone = this->GetUpperLayer()->Receive((unsigned char*)pSegment->SG_data);
+		return isDone;
+	} else {
+		return FALSE;
+	}
 }
 
 BOOL TransportLayer::Send(unsigned char * ppayload, int applicationDataSize) {
 	//AfxMessageBox("트랜스포트층 Send");
 	memcpy(this->_segment.SG_data, ppayload, applicationDataSize);
+	this->_segment.SG_dstPort = 567;//테스트를 위함
 
 	BOOL isDone;
 	isDone = this->GetUnderLayer()->Send((unsigned char*)&this->_segment, applicationDataSize + TP_SEGMENT_HEADER_SIZE);

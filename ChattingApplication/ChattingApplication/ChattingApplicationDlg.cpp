@@ -221,7 +221,9 @@ HCURSOR CChattingApplicationDlg::OnQueryDragIcon()
 BOOL CChattingApplicationDlg::Receive(unsigned char* ppayload) {
 	unsigned char* buffer = new unsigned char[APP_DATA_SIZE];//하위에서 Receive로 올려보내는건, 어쨋든 APP자료구조의 data부분이므로 이 크기를 넘지 않음
 	memset(buffer, '\0', APP_DATA_SIZE);
+	AfxMessageBox("채팅 메시지를 받았고, memcpy로 buffer에 쓰기 전");
 	memcpy(buffer, ppayload, this->_currentMessageSize);
+	AfxMessageBox("채팅 메시지를 받았고, memcpy로 buffer에 쓴 후");
 
 	CString messageFormat;
 	if (this->_currentMessageDstAddress[0] == 0xff &&
@@ -343,6 +345,8 @@ void CChattingApplicationDlg::OnBnClickedButtonSet(){ //소스, 목적지 주소값을 _s
 		//this->_srcAddressPanel.EnableWindow(TRUE);//소스주소는 바뀔 이유가 없다.
 		this->_broadcastPanel.EnableWindow(TRUE);
 		this->_sendButton.EnableWindow(FALSE);
+
+		this->_pPhysicsLayer->setThreadSwitch(FALSE);//주소를 재설정하는경우, Receive스레드를 잠시 끈다.
 	}
 	else {//셋을 누르는 경우임
 		unsigned char p1, p2, p3, p4;
@@ -357,6 +361,9 @@ void CChattingApplicationDlg::OnBnClickedButtonSet(){ //소스, 목적지 주소값을 _s
 		//this->_srcAddressPanel.EnableWindow(FALSE);//소스주소는 바뀔 이유가 없다.
 		this->_broadcastPanel.EnableWindow(FALSE);
 		this->_sendButton.EnableWindow(TRUE);
+
+		this->_pPhysicsLayer->setThreadSwitch(TRUE);//주소 설정을 완료하면 Receive스레드가 재가동을 시작한다.
+		this->_pPhysicsLayer->PacketStartDriver();
 	}
 
 	UpdateData(FALSE);

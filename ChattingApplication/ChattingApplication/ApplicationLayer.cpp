@@ -13,7 +13,7 @@ void ApplicationLayer::Refresh() {
 }
 
 BOOL ApplicationLayer::Receive(unsigned char * ppayload) {
-	//AfxMessageBox("어플리케이션 Receive 호출됨");
+	AfxMessageBox("어플리케이션 Receive 호출됨");
 	APPDATA* appdata = (APPDATA*)ppayload;
 
 	//대화상자에서 '보낸이'주소정보를 띄워주기위해 필요한 작업

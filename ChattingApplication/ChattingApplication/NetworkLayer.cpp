@@ -20,8 +20,7 @@ BOOL NetworkLayer::Receive(unsigned char * ppayload) {
 		BOOL isDone;
 		isDone = this->GetUpperLayer()->Receive((unsigned char*)pPacket->IP_data);
 		return isDone;
-	}
-	else {
+	} else {
 		return FALSE;
 	}
 }

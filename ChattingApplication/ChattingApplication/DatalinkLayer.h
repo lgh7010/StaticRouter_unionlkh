@@ -1,12 +1,9 @@
 #pragma once
 #include "LayerStructure.h"
 
-//pcap라이브러리 포함
-#include <pcap.h>
-#include <WinSock2.h>
-#pragma comment(lib, "ws2_32.lib")
-#include <Packet32.h>
-#pragma comment(lib, "packet.lib")
+//로컬 MAC주소를 받아오기 위해 추가함
+#include <IPHlpApi.h>
+#pragma comment(lib, "iphlpapi.lib")
 
 class DatalinkLayer : public LayerStructure
 {

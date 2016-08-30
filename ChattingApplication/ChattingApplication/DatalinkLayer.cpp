@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "DatalinkLayer.h"
 
-//로컬 MAC주소를 받아오기 위해 추가함
-#include <IPHlpApi.h>
-#pragma comment(lib, "iphlpapi.lib")
-
-
 DatalinkLayer::DatalinkLayer(char* pName) : LayerStructure(pName) {
 	this->ResetFrame();
 }
@@ -16,9 +11,13 @@ BOOL DatalinkLayer::Receive(unsigned char * ppayload) {
 	//AfxMessageBox("데이터링크 Receive 호출됨");
 	ETHERNET_FRAME* pFrame = (ETHERNET_FRAME*)ppayload;
 
-	BOOL isDone;
-	isDone = this->GetUpperLayer()->Receive((unsigned char*)pFrame->EF_data);
-	return isDone;
+	if (memcmp(pFrame->EF_dstaddr, this->_frame.EF_srcaddr, 6)) {
+		BOOL isDone;
+		isDone = this->GetUpperLayer()->Receive((unsigned char*)pFrame->EF_data);
+		return isDone;
+	} else {
+		return FALSE;
+	}
 }
 
 BOOL DatalinkLayer::Send(unsigned char * ppayload, int packetLength) {
@@ -138,3 +137,106 @@ void DatalinkLayer::setSrcMACAddress() {
 		}
 	} while (pIpAdapterInfo);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*#define ETHER_ADDR_LEN	6
+
+int DatalinkLayer::test(){
+	int i = 0;
+	int length = 0;
+	char errbuf[PCAP_ERRBUF_SIZE];
+	unsigned char packet[1500];
+
+	pcap_if_t *alldevs;
+	pcap_if_t *d;
+	pcap_t *fp;
+
+	bpf_u_int32 net;
+	bpf_u_int32 mask;
+	struct in_addr net_addr;
+	struct in_addr mask_addr;
+
+	LPADAPTER adapter = NULL;
+	PPACKET_OID_DATA pOidData;
+
+	ETHERNET_FRAME eth;
+
+	pOidData = (PPACKET_OID_DATA)malloc(sizeof(PACKET_OID_DATA));
+	pOidData->Oid = 0x01010101;
+	pOidData->Length = 6;
+
+	if (pcap_findalldevs(&alldevs, errbuf) == -1) {
+		fprintf(stderr, "Error in pcap_findalldevs: %s\n", errbuf);
+		exit(1);
+	}
+
+	for (d = alldevs; d; d = d->next) {
+		printf("%d, %d", ++i, d->name);
+		if (d->description)
+			printf("(%s)\n", d->description);
+		else
+			printf(" (No description available)\n");
+	}
+
+	for (d = alldevs, i = 0; i < 1 - 1; d = d->next, i++);
+
+	if (pcap_lookupnet(d->name, &net, &mask, errbuf) < 0) {
+		printf("네트워크 디바이스 정보를 가져올 수 없습니다\n");
+		return 0;
+	}
+
+	adapter = PacketOpenAdapter(d->name);
+	PacketRequest(adapter, FALSE, pOidData);
+
+	net_addr.s_addr = net;
+	mask_addr.s_addr = mask;
+
+	printf("Device Name : %s \n", d->name);
+	printf("Network Address : %s \n", inet_ntoa(net_addr));
+	printf("Netmask Info : %s \n", inet_ntoa(mask_addr));
+	printf("Mac Address : %02x-%02x-%02x-%02x-%02x-%02x\n",
+		pOidData->Data[0], pOidData->Data[1], pOidData->Data[2],
+		pOidData->Data[3], pOidData->Data[4], pOidData->Data[5]);
+
+	if ((fp = pcap_open_live(d->name, 65536, 0, 1000, errbuf)) == NULL) {
+		return -1;
+	}
+
+	memset(packet, 0, sizeof(packet));
+
+	eth.EF_dstaddr[0] = this->_frame.EF_dstaddr[0];	eth.EF_dstaddr[1] = this->_frame.EF_dstaddr[1];
+	eth.EF_dstaddr[2] = this->_frame.EF_dstaddr[2];	eth.EF_dstaddr[3] = this->_frame.EF_dstaddr[3];
+	eth.EF_dstaddr[4] = this->_frame.EF_dstaddr[4];	eth.EF_dstaddr[5] = this->_frame.EF_dstaddr[5];
+
+	eth.EF_srcaddr[0] = pOidData->Data[0];	eth.EF_srcaddr[1] = pOidData->Data[1];
+	eth.EF_srcaddr[2] = pOidData->Data[2];	eth.EF_srcaddr[3] = pOidData->Data[3];
+	eth.EF_srcaddr[4] = pOidData->Data[4];	eth.EF_srcaddr[5] = pOidData->Data[5];
+
+	eth.EF_type = 0x1234;
+
+	memcpy(packet, &eth, sizeof(eth));
+	length += sizeof(eth);
+
+	if (pcap_sendpacket(fp, packet, length) != 0) {
+		fprintf(stderr, "\nError sending the packet: \n", pcap_geterr(fp));
+		return -1;
+	}
+
+	return 0;
+}*/
